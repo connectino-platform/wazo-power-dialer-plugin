@@ -29,9 +29,9 @@ pip install -r requirements.txt
 
 ### Install plugin
 ```shell
-wazo-plugind-cli -c "install git https://github.com/farhad2161/wazo-template-plugin.git"
+wazo-plugind-cli -c "install git https://github.com/connectino-platform/wazo-power-dialer-plugin.git"
 ```
 ### Uninstall plugin
 ```shell
-wazo-plugind-cli -c "uninstall connectino/wazo-confd-template"
+wazo-plugind-cli -c "uninstall connectino/wazo-confd-power_dialer"
 ```

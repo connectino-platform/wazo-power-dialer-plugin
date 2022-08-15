@@ -5,6 +5,7 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 class CampaignSchema(BaseSchema):
     uuid = fields.Str(dump_only=True)
+    tenant_uuid = fields.Str(required=True)
     name = fields.Str(required=True)
     status = fields.String(validate=OneOf(['active', 'inactive']), allow_none=False)
     schedule_start_date = fields.Date()

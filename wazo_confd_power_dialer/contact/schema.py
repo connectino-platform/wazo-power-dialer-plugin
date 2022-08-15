@@ -4,7 +4,7 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 class ContactSchema(BaseSchema):
     uuid = fields.Str(dump_only=True)
-    tenant_uuid = fields.Str(required=True)
+    tenant_uuid = fields.Str(dump_only=True)
     name = fields.Str(required=True)
     family = fields.Str(required=True)
     phone = fields.Str(required=True)

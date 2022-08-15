@@ -6,7 +6,7 @@ case "$1" in
     ;;
 
     package)
-        tar xvf dist/python3/wazo-confd-power_dialer-*.tar.gz -C ${pkgdir}
+        tar xvf dist/python3/wazo-confd-power-dialer-*.tar.gz -C ${pkgdir}
         cp -R etc ${pkgdir}/
     ;;
 

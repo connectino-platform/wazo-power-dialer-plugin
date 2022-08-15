@@ -15,7 +15,7 @@ class ContactListResource(ListResource):
     model = ContactModel
 
     def build_headers(self, model):
-        return {'Location': url_for('contacts', uuid=model.uuid, _external=True)}
+        return {'Location': url_for('campaigns_contacts', uuid=model.uuid, _external=True)}
 
     @required_acl('confd.contacts.create')
     def post(self):

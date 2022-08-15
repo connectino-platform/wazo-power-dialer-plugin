@@ -4,7 +4,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(
-    name='wazo-confd-power_dialer',
+    name='wazo-confd-power-dialer',
     version='0.1',
     description='Connectino power_dialer plugin',
     author='Farhad K',

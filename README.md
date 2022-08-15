@@ -33,5 +33,5 @@ wazo-plugind-cli -c "install git https://github.com/connectino-platform/wazo-pow
 ```
 ### Uninstall plugin
 ```shell
-wazo-plugind-cli -c "uninstall connectino/wazo-confd-power_dialer"
+wazo-plugind-cli -c "uninstall connectino/wazo-confd-power-dialer"
 ```

@@ -1,0 +1,126 @@
+paths:
+  /campaigns:
+    get:
+      summary: List campaign
+      description: '**Required ACL:** `confd.campaigns.read`'
+      tags:
+        - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: campaigns list
+          schema:
+            $ref: '#/definitions/CampaignItems'
+    post:
+      summary: Create campaign
+      description: '**Required ACL:** `confd.campaigns.create`'
+      tags:
+        - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          description: Campaign to create
+          required: true
+          schema:
+            $ref: '#/definitions/Campaign'
+      responses:
+        '201':
+          description: Campaign created
+          schema:
+            $ref: '#/definitions/Campaign'
+        '400':
+          $ref: '#/responses/CreateError'
+
+  /campaigns/{campaign_uuid}:
+    get:
+      summary: Get campaign
+      description: '**Required ACL:** `confd.campaigns.{uuid}.read`'
+      tags:
+        - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/campaignuuid'
+      responses:
+        '200':
+          description: Campaign
+          schema:
+            $ref: '#/definitions/Campaign'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      summary: Update campaign
+      description: '**Required ACL:** `confd.campaigns.{uuid}.update`'
+      tags:
+        - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/campaignuuid'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Campaign'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      summary: Delete campaign
+      description: '**Required ACL:** `confd.campaigns.{uuid}.delete`'
+      tags:
+        - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/campaignuuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+
+parameters:
+  campaignuuid:
+    required: true
+    type: string
+    name: campaign_uuid
+    in: path
+    description: Campaign's UUID
+
+definitions:
+  Campaign:
+    title: Campaign
+    allOf:
+      - properties:
+          uuid:
+            type: string
+            format: uuid
+            readOnly: true
+          name:
+            type: string
+
+
+  CampaignItems:
+    title: CampaignItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Campaign'
+      total:
+        type: integer
+    required:
+      - total

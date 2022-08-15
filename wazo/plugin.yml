@@ -1,0 +1,5 @@
+name: wazo-confd-power_dialer
+namespace: connectino
+version: 0.0.1
+author: Farhad K
+display_name: Connectino power_dialer

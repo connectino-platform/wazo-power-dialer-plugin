@@ -1,0 +1,28 @@
+#!/bin/sh
+
+case "$1" in
+    build)
+        python3 setup.py bdist -d dist/python3
+    ;;
+
+    package)
+        tar xvf dist/python3/wazo-confd-power_dialer-*.tar.gz -C ${pkgdir}
+        cp -R etc ${pkgdir}/
+    ;;
+
+    install)
+        systemctl restart wazo-confd
+    ;;
+
+    uninstall)
+        systemctl restart wazo-confd
+    ;;
+
+    postrm)
+    ;;
+
+    *)
+        echo "$0 called with unknown argument '$1'" >&2
+        exit 1
+    ;;
+esac

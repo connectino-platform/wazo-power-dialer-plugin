@@ -2,9 +2,12 @@ from sqlalchemy import (
     Column
 )
 from sqlalchemy import text
+from sqlalchemy.orm import relationship
 from sqlalchemy.types import String
 from xivo_dao.helpers.db_manager import UUIDAsString
 
+from ..contact_contact_list.model import ContactContactListModel
+from ..contact_list.model import ContactListModel
 from ..db import Base
 
 
@@ -21,3 +24,4 @@ class ContactModel(Base):
     title = Column(String(128), nullable=True)
     company = Column(String(128), nullable=True)
     address = Column(String(512), nullable=True)
+    contact_lists = relationship(ContactListModel, secondary=ContactContactListModel)

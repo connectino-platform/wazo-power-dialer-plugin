@@ -25,4 +25,4 @@ class ContactListModel(Base):
     tenant_uuid = Column(UUIDAsString(36), nullable=False)
     name = Column(String(128), nullable=False)
     description = Column(String(512), nullable=True)
-    # contacts = relationship(ContactModel, secondary=ContactContactListModel)
+    contacts = relationship(ContactModel, secondary=ContactContactListModel)

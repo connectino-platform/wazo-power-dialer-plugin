@@ -7,6 +7,8 @@ from .contact.services import build_contact_service
 from .contact_list.services import build_contact_list_service
 from .contact.resource import ContactListResource, ContactItemResource
 from .contact_list.resource import ContactListListResource, ContactListItemResource
+from .contact_contact_list.resource import ContactContactListItemResource, ContactContactListListResource
+from .contact_contact_list.services import build_contact_contact_list_service
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +21,7 @@ class Plugin:
         campaign_service = build_campaign_service()
         contact_service = build_contact_service()
         contact_list_service = build_contact_list_service()
+        contact_contact_list_service = build_contact_contact_list_service()
 
         # Campaigns
         api.add_resource(
@@ -57,6 +60,14 @@ class Plugin:
             '/campaigns/contact-lists/<uuid:uuid>',
             endpoint='campaigns_contact_lists',
             resource_class_args=(contact_list_service,)
+        )
+
+        # Contact - Contact list
+        api.add_resource(
+            ContactContactListListResource,
+            '/campaigns/contact-lists/<uuid:contact_list_uuid>/contact/<uuid:contact_uuid>',
+            endpoint='campaigns_contact_contact_lists',
+            resource_class_args=(contact_contact_list_service,)
         )
 
         logger.info('power_dialer plugin loaded')

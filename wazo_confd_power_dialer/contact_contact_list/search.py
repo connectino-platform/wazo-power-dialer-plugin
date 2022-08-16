@@ -7,9 +7,8 @@ contact_contact_list_config = SearchConfig(
     table=ContactContactListModel,
     columns={
         'uuid': ContactContactListModel.uuid,
-        'name': ContactContactListModel.name,
     },
-    default_sort='name',
+    default_sort='uuid',
 )
 
 contact_contact_list_search = SearchSystem(contact_contact_list_config)

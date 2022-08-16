@@ -1,5 +1,6 @@
 from sqlalchemy import (
-    Column
+    Column,
+    ForeignKey
 )
 from sqlalchemy import text
 from sqlalchemy.types import String
@@ -12,5 +13,5 @@ class ContactContactListModel(Base):
     __tablename__ = 'plugin_powerdialer_contact_contact_list'
 
     uuid = Column(UUIDAsString(36), primary_key=True, server_default=text('uuid_generate_v4()'))
-    contact_uuid = Column(UUIDAsString(36), nullable=False)
-    contact_list_uuid = Column(UUIDAsString(36), nullable=False)
+    contact_uuid = Column(UUIDAsString(36), ForeignKey('plugin_powerdialer_contact.uuid'), nullable=False)
+    contact_list_uuid = Column(UUIDAsString(36), ForeignKey('plugin_powerdialer_contact_list.uuid'), nullable=False)

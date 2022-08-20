@@ -9,6 +9,8 @@ from .contact.resource import ContactListResource, ContactItemResource
 from .contact_list.resource import ContactListListResource, ContactListItemResource
 from .contact_contact_list.resource import ContactContactListListResource
 from .contact_contact_list.services import build_contact_contact_list_service
+from .campaign_contact_list.resource import CampaignContactListListResource
+from .campaign_contact_list.services import build_campaign_contact_list_service
 
 logger = logging.getLogger(__name__)
 
@@ -22,52 +24,61 @@ class Plugin:
         contact_service = build_contact_service()
         contact_list_service = build_contact_list_service()
         contact_contact_list_service = build_contact_contact_list_service()
+        campaign_contact_list_service = build_campaign_contact_list_service()
 
         # Campaigns
         api.add_resource(
             CampaignListResource,
-            '/campaigns',
+            '/powerdialer/campaigns',
             resource_class_args=(campaign_service,)
         )
         api.add_resource(
             CampaignItemResource,
-            '/campaigns/<uuid:uuid>',
-            endpoint='campaigns',
+            '/powerdialer/campaigns/<uuid:uuid>',
+            endpoint='powerdialer_campaigns',
             resource_class_args=(campaign_service,)
         )
 
-        # Campaign contacts
+        # Contacts
         api.add_resource(
             ContactListResource,
-            '/campaigns/contacts',
+            '/powerdialer/contacts',
             resource_class_args=(contact_service,)
         )
         api.add_resource(
             ContactItemResource,
-            '/campaigns/contacts/<uuid:uuid>',
-            endpoint='campaigns_contacts',
+            '/powerdialer/contacts/<uuid:uuid>',
+            endpoint='powerdialer_contacts',
             resource_class_args=(contact_service,)
         )
 
-        # Campaign contacts list
+        # Contact lists
         api.add_resource(
             ContactListListResource,
-            '/campaigns/contact-lists',
+            '/powerdialer/contact-lists',
             resource_class_args=(contact_list_service,)
         )
         api.add_resource(
             ContactListItemResource,
-            '/campaigns/contact-lists/<uuid:uuid>',
-            endpoint='campaigns_contact_lists',
+            '/powerdialer/contact-lists/<uuid:uuid>',
+            endpoint='powerdialer_contact_lists',
             resource_class_args=(contact_list_service,)
         )
 
-        # Contact - Contact list
+        # Contact <=> Contact list
         api.add_resource(
             ContactContactListListResource,
-            '/campaigns/contact-lists/<uuid:contact_list_uuid>/contact/<uuid:contact_uuid>',
-            endpoint='campaigns_contact_contact_lists',
+            '/powerdialer/contact-lists/<uuid:contact_list_uuid>/contact/<uuid:contact_uuid>',
+            endpoint='powerdialer_contact_contact_lists',
             resource_class_args=(contact_contact_list_service,)
+        )
+
+        # Campaign <=> Contact list
+        api.add_resource(
+            CampaignContactListListResource,
+            '/powerdialer/campaigns/<uuid:campaign_uuid>/contact-lists/<uuid:contact_list_uuid>',
+            endpoint='powerdialer_campaigns_contact_lists',
+            resource_class_args=(campaign_contact_list_service,)
         )
 
         logger.info('power_dialer plugin loaded')

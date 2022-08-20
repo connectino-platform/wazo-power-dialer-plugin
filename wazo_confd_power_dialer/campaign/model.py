@@ -2,6 +2,7 @@ from sqlalchemy import (
     Column
 )
 from sqlalchemy import text
+from sqlalchemy.orm import relationship
 from sqlalchemy.types import (String, Boolean, Date, Time, Integer)
 from xivo_dao.helpers.db_manager import UUIDAsString
 
@@ -23,3 +24,7 @@ class CampaignModel(Base):
     is_recording = Column(Boolean, nullable=False)
     attempts = Column(Integer, nullable=False)
     attempts_interval = Column(Integer, nullable=False)
+    contact_lists = relationship(
+        'ContactListModel',
+        secondary='plugin_powerdialer_campaign_contact_list',
+    )

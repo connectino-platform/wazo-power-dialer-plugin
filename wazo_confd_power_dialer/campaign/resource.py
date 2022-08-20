@@ -15,7 +15,7 @@ class CampaignListResource(ListResource):
     model = CampaignModel
 
     def build_headers(self, model):
-        return {'Location': url_for('campaigns', uuid=model.uuid, _external=True)}
+        return {'Location': url_for('powerdialer_campaigns', uuid=model.uuid, _external=True)}
 
     @required_acl('confd.campaigns.create')
     def post(self):

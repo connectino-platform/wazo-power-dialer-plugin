@@ -20,3 +20,7 @@ class ContactListModel(Base):
         'ContactModel',
         secondary='plugin_powerdialer_contact_contact_list'
     )
+    campaigns = relationship(
+        'CampaignModel',
+        secondary='plugin_powerdialer_campaign_contact_list'
+    )

@@ -13,4 +13,4 @@ class ContactSchema(BaseSchema):
     title = fields.Str(required=False)
     company = fields.Str(required=False)
     address = fields.Str(required=False)
-    contact_lists = fields.Nested("ContactListSchema", exclude=("contacts",), many=True, dump_only=True)
+    contact_lists = fields.Nested("ContactListSchema", exclude=("contacts", "campaigns"), many=True, dump_only=True)

@@ -29,34 +29,17 @@ class ContactContactListListResource(ListResource):
         model = self.model(**form)
         model.contact_list_uuid = contact_list_uuid
         model.contact_uuid = contact_uuid
-        model = self.service.create(model)
-        return self.schema().dump(model), 201, self.build_headers(model)
 
-    # @required_acl('confd.contact_contact_lists.read')
-    # def get(self):
-    #     return super().get()
+        already_associated = self.service.search({"contact_list_uuid": contact_list_uuid, "contact_uuid": contact_uuid})
+        if already_associated.total:
+            model = already_associated.items[0]
+        else:
+            model = self.service.create(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.contact_contact_lists.delete')
     def delete(self, contact_list_uuid, contact_uuid):
         models = self.service.search({"contact_list_uuid": contact_list_uuid, "contact_uuid": contact_uuid})
-        logger.info(models)
         for model in models.items:
             self.service.delete(model)
         return '', 204
-
-
-# class ContactContactListItemResource(ItemResource):
-#     schema = ContactContactListSchema
-#     model = ContactContactListModel
-#
-#     @required_acl('confd.contact_contact_lists.read')
-#     def get(self, uuid):
-#         return super().get(uuid)
-#
-#     @required_acl('confd.contact_contact_lists.update')
-#     def put(self, uuid):
-#         return super().put(uuid)
-#
-#     @required_acl('confd.contact_contact_lists.delete')
-#     def delete(self, uuid):
-#         return super().delete(uuid)

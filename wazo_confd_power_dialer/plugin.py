@@ -7,7 +7,7 @@ from .contact.services import build_contact_service
 from .contact_list.services import build_contact_list_service
 from .contact.resource import ContactListResource, ContactItemResource
 from .contact_list.resource import ContactListListResource, ContactListItemResource
-from .contact_contact_list.resource import ContactContactListItemResource, ContactContactListListResource
+from .contact_contact_list.resource import ContactContactListListResource
 from .contact_contact_list.services import build_contact_contact_list_service
 
 logger = logging.getLogger(__name__)

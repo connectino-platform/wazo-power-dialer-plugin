@@ -3,7 +3,6 @@ from sqlalchemy import (
     ForeignKey
 )
 from sqlalchemy import text
-from sqlalchemy.types import String
 from xivo_dao.helpers.db_manager import UUIDAsString
 
 from ..db import Base

@@ -22,7 +22,7 @@ class CampaignContactListListResource(ListResource):
             _external=True
         )}
 
-    @required_acl('confd.campaign_contact_lists.create')
+    @required_acl('confd.powerdialer.campaign_contact_lists.create')
     def post(self, campaign_uuid, contact_list_uuid):
         form = self.schema().load(request.get_json())
         form = self.add_tenant_to_form(form)
@@ -30,15 +30,10 @@ class CampaignContactListListResource(ListResource):
         model.contact_list_uuid = contact_list_uuid
         model.campaign_uuid = campaign_uuid
 
-        already_associated = self.service.search(
-            {"campaign_uuid": campaign_uuid, "contact_list_uuid": contact_list_uuid})
-        if already_associated.total:
-            model = already_associated.items[0]
-        else:
-            model = self.service.create(model)
+        model = self.service.create(model)
         return self.schema().dump(model), 201, self.build_headers(model)
 
-    @required_acl('confd.campaign_contact_lists.delete')
+    @required_acl('confd.powerdialer.campaign_contact_lists.delete')
     def delete(self, contact_list_uuid, campaign_uuid):
         models = self.service.search({"contact_list_uuid": contact_list_uuid, "campaign_uuid": campaign_uuid})
         for model in models.items:

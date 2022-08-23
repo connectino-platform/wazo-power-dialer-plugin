@@ -5,7 +5,7 @@ from .campaign.resource import CampaignListResource, CampaignItemResource
 from .campaign.services import build_campaign_service
 from .contact.services import build_contact_service
 from .contact_list.services import build_contact_list_service
-from .contact.resource import ContactListResource, ContactItemResource
+from .contact.resource import ContactListResource, ContactItemResource, ContactImportResource
 from .contact_list.resource import ContactListListResource, ContactListItemResource
 from .contact_contact_list.resource import ContactContactListListResource
 from .contact_contact_list.services import build_contact_contact_list_service
@@ -49,6 +49,11 @@ class Plugin:
             ContactItemResource,
             '/powerdialer/contacts/<uuid:uuid>',
             endpoint='powerdialer_contacts',
+            resource_class_args=(contact_service,)
+        )
+        api.add_resource(
+            ContactImportResource,
+            '/powerdialer/contacts/import/contact-lists/<uuid:contact_list_uuid>',
             resource_class_args=(contact_service,)
         )
 

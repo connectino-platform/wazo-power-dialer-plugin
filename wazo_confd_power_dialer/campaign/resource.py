@@ -17,11 +17,11 @@ class CampaignListResource(ListResource):
     def build_headers(self, model):
         return {'Location': url_for('powerdialer_campaigns', uuid=model.uuid, _external=True)}
 
-    @required_acl('confd.campaigns.create')
+    @required_acl('confd.powerdialer.campaigns.create')
     def post(self):
         return super().post()
 
-    @required_acl('confd.campaigns.read')
+    @required_acl('confd.powerdialer.campaigns.read')
     def get(self):
         return super().get()
 
@@ -30,14 +30,14 @@ class CampaignItemResource(ItemResource):
     schema = CampaignSchema
     model = CampaignModel
 
-    @required_acl('confd.campaigns.read')
+    @required_acl('confd.powerdialer.campaigns.{uuid}.read')
     def get(self, uuid):
         return super().get(uuid)
 
-    @required_acl('confd.campaigns.update')
+    @required_acl('confd.powerdialer.campaigns.{uuid}.update')
     def put(self, uuid):
         return super().put(uuid)
 
-    @required_acl('confd.campaigns.delete')
+    @required_acl('confd.powerdialer.campaigns.{uuid}.delete')
     def delete(self, uuid):
         return super().delete(uuid)

@@ -8,6 +8,8 @@ contact_config = SearchConfig(
     columns={
         'uuid': ContactModel.uuid,
         'name': ContactModel.name,
+        "phone": ContactModel.phone,
+        "tenant_uuid": ContactModel.tenant_uuid,
     },
     default_sort='name',
 )

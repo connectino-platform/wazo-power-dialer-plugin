@@ -17,3 +17,4 @@ class CampaignSchema(BaseSchema):
     attempts = fields.Integer(required=False, missing=1)
     attempts_interval = fields.Integer(required=False, missing=10)
     contact_lists = fields.Nested("ContactListSchema", exclude=("campaigns", "contacts"), many=True, dump_only=True)
+    #

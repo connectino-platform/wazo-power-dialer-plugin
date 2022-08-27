@@ -1,9 +1,10 @@
 import logging
 
-from flask import url_for, request
+from flask import url_for
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ItemResource, ListResource
-
+from wazo_confd.helpers.restful import ItemResource, ListResource, ConfdResource
+from wazo_confd.plugins.application.schema import ApplicationSchema
+from xivo.tenant_flask_helpers import Tenant
 from .model import CampaignModel
 from .schema import CampaignSchema
 
@@ -41,3 +42,14 @@ class CampaignItemResource(ItemResource):
     @required_acl('confd.powerdialer.campaigns.{uuid}.delete')
     def delete(self, uuid):
         return super().delete(uuid)
+
+
+class CampaignRunnerResource(ConfdResource):
+    def __init__(self, service):
+        self.service = service
+
+    def post(self, uuid):
+        tenant = Tenant.autodetect()
+        application = self.service.get_application(tenant.uuid)
+        call = self.service.make_application_call(application.uuid)
+        return {"application": ApplicationSchema().dump(application), "call": call}

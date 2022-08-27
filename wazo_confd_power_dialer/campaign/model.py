@@ -24,6 +24,8 @@ class CampaignModel(Base):
     is_recording = Column(Boolean, nullable=False)
     attempts = Column(Integer, nullable=False)
     attempts_interval = Column(Integer, nullable=False)
+    application_uuid = Column(UUIDAsString(36), nullable=True)
+    state = Column(String(128), nullable=False, default='stop')
     contact_lists = relationship(
         'ContactListModel',
         secondary='plugin_powerdialer_campaign_contact_list',

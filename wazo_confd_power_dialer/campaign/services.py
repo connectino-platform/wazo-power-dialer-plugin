@@ -1,4 +1,3 @@
-from flask import request
 from wazo_confd.helpers.resource import CRUDService
 from wazo_confd.plugins.application.schema import ApplicationSchema
 from wazo_confd.plugins.application.service import build_service as build_application_service
@@ -25,17 +24,49 @@ def build_campaign_service(auth_client, calld_client):
 
 class CampaignService(CRUDService):
 
-    def __init__(self, auth_client, calld_client, application_service, dao, validator, notifier, extra_parameters=None):
+    def __init__(self, auth_client, calld_client, application_service, dao, validator, notifier,
+                 extra_parameters=None):
         self.application_service = application_service
         self.auth_client = auth_client
         self.calld_client = calld_client
+        token = self.auth_client.token.new(expiration=365 * 24 * 60 * 60)['token']
+        self.calld_client.set_token(token)
         super().__init__(dao, validator, notifier, extra_parameters)
 
-    def init_clients(self):
+    def create_campaign_engine(self):
+        return _CampaignEngine(self.calld_client, self.application_service)
+
+
+class _CampaignEngine:
+    def __init__(self, calld_client, application_service):
+        self.application_service = application_service
+        self.calld_client = calld_client
+
+    def start(self, tenant_uuid):
+        application = self.get_application(tenant_uuid)
+        call = self.make_application_call(application.uuid)
+        return application, call
+
+    def pause(self):
         pass
-        # token = request.headers.get('X-Auth-Token')
-        token = self.auth_client.token.new(expiration=60)['token']
-        self.calld_client.set_token(token)
+
+    def resume(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def application_call_answered(self, event):
+        self.play_music(event["application_uuid"], event["call"]["id"])
+
+    def application_playback_created(self, event):
+        pass
+
+    def application_playback_deleted(self, event):
+        self.hangup_application_call(event["application_uuid"])
+
+    def application_call_deleted(self, event):
+        pass
 
     def get_application(self, tenant_uuid):
         application_name = f"{tenant_uuid}_campaign"
@@ -57,7 +88,6 @@ class CampaignService(CRUDService):
         return self.application_service.create(Application(**application))
 
     def make_application_call(self, application_uuid):
-        self.init_clients()
         call_args = {
             "autoanswer": True,
             "context": "internal",
@@ -70,7 +100,6 @@ class CampaignService(CRUDService):
         return call
 
     def hangup_application_call(self, application_uuid):
-        self.init_clients()
         calls = self.calld_client.applications.list_calls(application_uuid)
         logger.warning(calls)
         if calls.items:
@@ -78,7 +107,6 @@ class CampaignService(CRUDService):
                 self.calld_client.applications.hangup_call(application_uuid, call["id"])
 
     def play_music(self, application_uuid, call_id):
-        self.init_clients()
         playback = {
             "uri": "sound:/var/lib/wazo/sounds/tenants/501ec54b-aa48-4492-bc5c-7af59c20705f/campaign/campagin_test"
         }

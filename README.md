@@ -35,3 +35,13 @@ wazo-plugind-cli -c "install git https://github.com/connectino-platform/wazo-pow
 ```shell
 wazo-plugind-cli -c "uninstall connectino/wazo-confd-power-dialer"
 ```
+
+### Drop all tables
+```postgresql
+drop table plugin_powerdialer_campaign_contact_call;
+drop table plugin_powerdialer_contact_contact_list;
+drop table plugin_powerdialer_campaign_contact_list;
+drop table plugin_powerdialer_contact_list;
+drop table plugin_powerdialer_contact;
+drop table plugin_powerdialer_campaign;
+```

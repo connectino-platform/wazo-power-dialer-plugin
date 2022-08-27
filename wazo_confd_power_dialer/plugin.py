@@ -3,6 +3,7 @@ import logging
 from wazo_calld_client import Client as CalldClient
 from wazo_auth_client import Client as AuthClient
 from .campaign.bus_consume import CampaignBusEventHandler
+from .campaign_contact_call.resource import CampaignContactCallListResource, CampaignContactCallItemResource
 from .db import init_db
 from .campaign.resource import CampaignListResource, CampaignItemResource, CampaignRunnerResource
 from .campaign.services import build_campaign_service
@@ -14,6 +15,7 @@ from .contact_contact_list.resource import ContactContactListListResource
 from .contact_contact_list.services import build_contact_contact_list_service
 from .campaign_contact_list.resource import CampaignContactListListResource
 from .campaign_contact_list.services import build_campaign_contact_list_service
+from .campaign_contact_call.services import build_campaign_contact_call_service
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +33,7 @@ class Plugin:
         contact_list_service = build_contact_list_service()
         contact_contact_list_service = build_contact_contact_list_service()
         campaign_contact_list_service = build_campaign_contact_list_service()
+        campaign_contact_call_service = build_campaign_contact_call_service()
         bus_consumer = dependencies['bus_consumer']
         bus_event_handler = CampaignBusEventHandler(campaign_service)
         bus_event_handler.subscribe(bus_consumer)
@@ -97,6 +100,19 @@ class Plugin:
             '/powerdialer/campaigns/<uuid:campaign_uuid>/contact-lists/<uuid:contact_list_uuid>',
             endpoint='powerdialer_campaigns_contact_lists',
             resource_class_args=(campaign_contact_list_service,)
+        )
+
+        # Campaign Contact Call
+        api.add_resource(
+            CampaignContactCallListResource,
+            '/powerdialer/campaign-contact-calls',
+            resource_class_args=(campaign_contact_call_service,)
+        )
+        api.add_resource(
+            CampaignContactCallItemResource,
+            '/powerdialer/campaign-contact-calls/<uuid:uuid>',
+            endpoint='powerdialer_campaign_contact_calls',
+            resource_class_args=(campaign_contact_call_service,)
         )
 
         logger.info('power_dialer plugin loaded')

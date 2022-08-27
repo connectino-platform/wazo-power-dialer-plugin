@@ -16,5 +16,6 @@ class CampaignSchema(BaseSchema):
     is_recording = fields.Boolean(required=False, missing=False)
     attempts = fields.Integer(required=False, missing=1)
     attempts_interval = fields.Integer(required=False, missing=10)
+    application_uuid = fields.Str(dump_only=True)
+    state = fields.Str(dump_only=True)
     contact_lists = fields.Nested("ContactListSchema", exclude=("campaigns", "contacts"), many=True, dump_only=True)
-    #

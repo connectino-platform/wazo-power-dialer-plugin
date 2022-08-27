@@ -20,11 +20,11 @@ class ContactListResource(ListResource):
     def build_headers(self, model):
         return {'Location': url_for('powerdialer_contacts', uuid=model.uuid, _external=True)}
 
-    @required_acl('confd.contacts.create')
+    @required_acl('confd.powerdialer.contacts.create')
     def post(self):
         return super().post()
 
-    @required_acl('confd.contacts.read')
+    @required_acl('confd.powerdialer.contacts.read')
     def get(self):
         return super().get()
 

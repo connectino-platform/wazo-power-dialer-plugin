@@ -69,40 +69,51 @@ class CampaignService(CRUDService):
         pass
 
     def application_call_answered(self, event):
+        campaign_contact_call = self.find_last_campaign_contact_call(event["application_uuid"])
+        campaign_contact_call.call_answered = datetime.now()
+        self.campaign_contact_call_service.edit(campaign_contact_call)
+        self.commit()
         self.play_music(event["application_uuid"], event["call"]["id"])
 
     def application_playback_created(self, event):
-        pass
+        campaign_contact_call = self.find_last_campaign_contact_call(event["application_uuid"])
+        campaign_contact_call.playback_created = datetime.now()
+        self.campaign_contact_call_service.edit(campaign_contact_call)
+        self.commit()
 
     def application_playback_deleted(self, event):
+        campaign_contact_call = self.find_last_campaign_contact_call(event["application_uuid"])
+        campaign_contact_call.playback_deleted = datetime.now()
+        self.campaign_contact_call_service.edit(campaign_contact_call)
+        self.commit()
         self.hangup_application_call(event["application_uuid"])
 
     def application_call_deleted(self, event):
+        campaign_contact_call = self.find_last_campaign_contact_call(event["application_uuid"])
+        campaign_contact_call.call_deleted = datetime.now()
+        self.campaign_contact_call_service.edit(campaign_contact_call)
+        self.commit()
         self.make_next_application_call(event["application_uuid"])
 
     def find_next_campaign_contact_call(self, application_uuid):
         campaign = self.get_by(application_uuid=application_uuid)
-        last_call = self.campaign_contact_call_service.search({
+        next_call = self.campaign_contact_call_service.search({
             "campaign_uuid": campaign.uuid,
             "make_call": None,
             "limit": 1
         })
-        if last_call.total:
-            return last_call.items[0]
+        if next_call.total:
+            return next_call.items[0]
         else:
             return None
 
-    def get_application(self, tenant_uuid):
-        application_name = self.generate_application_name(tenant_uuid)
-        already_created_application = self.application_service.find_by(name=application_name)
-
-        if already_created_application:
-            return already_created_application
-
-        return self.create_application(tenant_uuid)
+    def find_last_campaign_contact_call(self, application_uuid):
+        campaign = self.get_by(application_uuid=application_uuid)
+        last_call = self.campaign_contact_call_service.get_last_cantact_call(campaign.uuid)
+        return last_call
 
     def create_application(self, tenant_uuid):
-        application_name = self.generate_application_name(tenant_uuid)
+        application_name = f"{tenant_uuid}_campaign"
         application_args = {
             "name": application_name,
             "destination": "node",
@@ -114,9 +125,6 @@ class CampaignService(CRUDService):
         }
         self.confd_client.tenant_uuid = tenant_uuid
         return self.confd_client.applications.create(application_args)
-
-    def generate_application_name(self, tenant_uuid):
-        return f"{tenant_uuid}_campaign"
 
     def create_empty_campaign_contact_call(self, campaign):
         campaign_contact_call_canceled = self.campaign_contact_call_service.search({
@@ -157,8 +165,7 @@ class CampaignService(CRUDService):
             "variables": {}
         }
         try:
-            call = self.calld_client.applications.make_call(application_uuid, call_args)
-            return call
+            self.calld_client.applications.make_call(application_uuid, call_args)
         except:
             logging.error(traceback.format_exc())
 

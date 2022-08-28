@@ -43,3 +43,7 @@ def edit(campaign_contact_call):
 
 def delete(campaign_contact_call):
     _persistor().delete(campaign_contact_call)
+
+
+def get_last_cantact_call(campaign_uuid):
+    return _persistor().get_last_cantact_call(campaign_uuid)

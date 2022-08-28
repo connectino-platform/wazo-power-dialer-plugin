@@ -49,7 +49,5 @@ class CampaignRunnerResource(ConfdResource):
         self.service = service
 
     def post(self, uuid):
-        tenant = Tenant.autodetect()
-        campaign_engine = self.service.create_campaign_engine()
-        application, call = campaign_engine.start(tenant.uuid)
-        return {"application": ApplicationSchema().dump(application), "call": call}
+        application = self.service.start(uuid)
+        return application

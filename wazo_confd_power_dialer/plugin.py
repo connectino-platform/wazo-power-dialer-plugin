@@ -2,6 +2,7 @@ import logging
 
 from wazo_calld_client import Client as CalldClient
 from wazo_auth_client import Client as AuthClient
+from wazo_confd_client import Client as ConfdClient
 from .campaign.bus_consume import CampaignBusEventHandler
 from .campaign_contact_call.resource import CampaignContactCallListResource, CampaignContactCallItemResource
 from .db import init_db
@@ -27,8 +28,9 @@ class Plugin:
         auth_client = AuthClient(host='127.0.0.1', username='root', password='12345', verify_certificate=False,
                                  https=True)
         calld_client = CalldClient(host='127.0.0.1', port=443, verify_certificate=False, https=True)
+        confd_client = ConfdClient(host='127.0.0.1', port=443, verify_certificate=False, https=True)
         init_db('postgresql://asterisk:proformatique@localhost/asterisk?application_name=wazo-power_dialer-plugin')
-        campaign_service = build_campaign_service(auth_client, calld_client)
+        campaign_service = build_campaign_service(auth_client, calld_client, confd_client)
         contact_service = build_contact_service()
         contact_list_service = build_contact_list_service()
         contact_contact_list_service = build_contact_contact_list_service()

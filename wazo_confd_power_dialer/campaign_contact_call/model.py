@@ -13,7 +13,7 @@ class CampaignContactCallModel(Base):
 
     uuid = Column(UUIDAsString(36), primary_key=True, server_default=text('uuid_generate_v4()'))
     phone = Column(String(128), nullable=False)
-    make_call = Column(DateTime, nullable=False)
+    make_call = Column(DateTime, nullable=True)
     call_answered = Column(DateTime, nullable=True)
     playback_created = Column(DateTime, nullable=True)
     playback_deleted = Column(DateTime, nullable=True)

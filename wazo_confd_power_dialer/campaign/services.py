@@ -1,6 +1,7 @@
 import traceback
 from datetime import datetime
 
+from marshmallow import ValidationError
 from wazo_confd.helpers.resource import CRUDService
 from wazo_confd.plugins.application.service import build_service as build_application_service
 from xivo_dao.helpers.db_manager import Session
@@ -55,20 +56,38 @@ class CampaignService(CRUDService):
         campaign.state = "start"
         self.edit(campaign)
         self.commit()
+        self.delete_empty_campaign_contact_call(campaign)
         self.create_empty_campaign_contact_call(campaign)
         self.make_next_application_call(application["uuid"])
-        return application
+        return campaign
 
-    def pause(self):
-        pass
+    def pause(self, campaign_uuid):
+        campaign = self.get_by(uuid=campaign_uuid)
+        campaign.state = "pause"
+        self.edit(campaign)
+        self.commit()
+        return campaign
 
-    def resume(self):
-        pass
+    def resume(self, campaign_uuid):
+        campaign = self.get_by(uuid=campaign_uuid)
+        if campaign.state != "resume":
+            raise ValidationError("only campaigns with pause state can be resumed.")
+        campaign.state = "resume"
+        self.edit(campaign)
+        self.commit()
+        return campaign
 
-    def stop(self):
-        pass
+    def stop(self, campaign_uuid):
+        campaign = self.get_by(uuid=campaign_uuid)
+        campaign.state = "stop"
+        self.edit(campaign)
+        self.commit()
+        self.delete_empty_campaign_contact_call(campaign)
+        return campaign
 
     def application_call_answered(self, event):
+        if event["call"]["is_caller"]:
+            return
         campaign_contact_call = self.find_last_campaign_contact_call(event["application_uuid"])
         campaign_contact_call.call_answered = datetime.now()
         self.campaign_contact_call_service.edit(campaign_contact_call)
@@ -97,6 +116,9 @@ class CampaignService(CRUDService):
 
     def find_next_campaign_contact_call(self, application_uuid):
         campaign = self.get_by(application_uuid=application_uuid)
+        if campaign.state != "start" and campaign.state != "resume":
+            return None
+
         next_call = self.campaign_contact_call_service.search({
             "campaign_uuid": campaign.uuid,
             "make_call": None,
@@ -127,14 +149,6 @@ class CampaignService(CRUDService):
         return self.confd_client.applications.create(application_args)
 
     def create_empty_campaign_contact_call(self, campaign):
-        campaign_contact_call_canceled = self.campaign_contact_call_service.search({
-            "campaign_uuid": campaign.uuid,
-            "make_call": None
-        })
-        if campaign_contact_call_canceled.total:
-            for campaign_contact_call in campaign_contact_call_canceled.items:
-                self.campaign_contact_call_service.delete(campaign_contact_call)
-
         for contact_list in campaign.contact_lists:
             contact_list_with_contacts = self.contact_list_service.get_by(uuid=contact_list.uuid)
             for contact in contact_list_with_contacts.contacts:
@@ -144,6 +158,17 @@ class CampaignService(CRUDService):
                 campaign_contact_call.contact_list_uuid = contact_list.uuid
                 campaign_contact_call.contact_uuid = contact.uuid
                 self.campaign_contact_call_service.create(campaign_contact_call)
+
+        Session.commit()
+
+    def delete_empty_campaign_contact_call(self, campaign):
+        campaign_contact_call_canceled = self.campaign_contact_call_service.search({
+            "campaign_uuid": campaign.uuid,
+            "make_call": None
+        })
+        if campaign_contact_call_canceled.total:
+            for campaign_contact_call in campaign_contact_call_canceled.items:
+                self.campaign_contact_call_service.delete(campaign_contact_call)
 
         Session.commit()
 

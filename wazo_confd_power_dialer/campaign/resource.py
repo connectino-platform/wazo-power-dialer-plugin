@@ -3,8 +3,6 @@ import logging
 from flask import url_for
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ItemResource, ListResource, ConfdResource
-from wazo_confd.plugins.application.schema import ApplicationSchema
-from xivo.tenant_flask_helpers import Tenant
 from .model import CampaignModel
 from .schema import CampaignSchema
 
@@ -44,10 +42,49 @@ class CampaignItemResource(ItemResource):
         return super().delete(uuid)
 
 
-class CampaignRunnerResource(ConfdResource):
+class CampaignStartResource(ConfdResource):
+    schema = CampaignSchema
+
     def __init__(self, service):
         self.service = service
 
-    def post(self, uuid):
-        application = self.service.start(uuid)
-        return application
+    @required_acl('confd.powerdialer.campaigns.{uuid}.start')
+    def put(self, uuid):
+        model = self.service.start(uuid)
+        return self.schema().dump(model)
+
+
+class CampaignPauseResource(ConfdResource):
+    schema = CampaignSchema
+
+    def __init__(self, service):
+        self.service = service
+
+    @required_acl('confd.powerdialer.campaigns.{uuid}.pause')
+    def put(self, uuid):
+        model = self.service.pause(uuid)
+        return self.schema().dump(model)
+
+
+class CampaignStopResource(ConfdResource):
+    schema = CampaignSchema
+
+    def __init__(self, service):
+        self.service = service
+
+    @required_acl('confd.powerdialer.campaigns.{uuid}.stop')
+    def put(self, uuid):
+        model = self.service.stop(uuid)
+        return self.schema().dump(model)
+
+
+class CampaignResumeResource(ConfdResource):
+    schema = CampaignSchema
+
+    def __init__(self, service):
+        self.service = service
+
+    @required_acl('confd.powerdialer.campaigns.{uuid}.resume')
+    def put(self, uuid):
+        model = self.service.resume(uuid)
+        return self.schema().dump(model)

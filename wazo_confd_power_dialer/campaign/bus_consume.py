@@ -12,6 +12,16 @@ class CampaignBusEventHandler:
         bus_consumer.on_event('application_playback_deleted', self._application_playback_deleted)
         bus_consumer.on_event('application_call_deleted', self._application_call_deleted)
         bus_consumer.on_event('application_playback_created', self._application_playback_created)
+        bus_consumer.on_event('application_call_entered', self._application_call_entered)
+        bus_consumer.on_event('application_call_initiated', self._application_call_initiated)
+        bus_consumer.on_event('application_call_updated', self._application_call_updated)
+        bus_consumer.on_event('application_progress_started', self._application_progress_started)
+        bus_consumer.on_event('application_progress_stopped', self._application_progress_stopped)
+        bus_consumer.on_event('application_destination_node_created', self._application_destination_node_created)
+        bus_consumer.on_event('application_node_created', self._application_node_created)
+        bus_consumer.on_event('application_node_deleted', self._application_node_deleted)
+        bus_consumer.on_event('application_node_updated', self._application_node_updated)
+        bus_consumer.on_event('application_user_outgoing_call_created', self._application_user_outgoing_call_created)
 
     def _application_call_answered(self, event):
         logger.warning('========>application_call_answered<===========')
@@ -45,3 +55,43 @@ class CampaignBusEventHandler:
         # 'snoops': {}, 'status': 'Up', 'creation_time': '2022-08-27T01:35:51.041-0400', 'caller_id_name': 'test1',
         # 'user_uuid': None, 'is_caller': False, 'on_hold': False}}
         self._service.application_call_deleted(event)
+
+    def _application_call_entered(self, event):
+        logger.warning('========>application_call_entered<===========')
+        logger.warning(event)
+
+    def _application_call_initiated(self, event):
+        logger.warning('========>application_call_initiated<===========')
+        logger.warning(event)
+
+    def _application_call_updated(self, event):
+        logger.warning('========>application_call_updated<===========')
+        logger.warning(event)
+
+    def _application_progress_started(self, event):
+        logger.warning('========>application_progress_started<===========')
+        logger.warning(event)
+
+    def _application_progress_stopped(self, event):
+        logger.warning('========>application_progress_stopped<===========')
+        logger.warning(event)
+
+    def _application_destination_node_created(self, event):
+        logger.warning('========>application_destination_node_created<===========')
+        logger.warning(event)
+
+    def _application_node_created(self, event):
+        logger.warning('========>application_node_created<===========')
+        logger.warning(event)
+
+    def _application_node_deleted(self, event):
+        logger.warning('========>application_node_deleted<===========')
+        logger.warning(event)
+
+    def _application_node_updated(self, event):
+        logger.warning('========>application_node_updated<===========')
+        logger.warning(event)
+
+    def _application_user_outgoing_call_created(self, event):
+        logger.warning('========>application_user_outgoing_call_created<===========')
+        logger.warning(event)

@@ -18,6 +18,9 @@ setup(
     entry_points={
         'wazo_confd.plugins': [
             'power_dialer = wazo_confd_power_dialer.plugin:Plugin'
+        ],
+        'wazo_calld.plugins': [
+            'calld_power_dialer = wazo_calld_power_dialer.plugin:Plugin'
         ]
     }
 )

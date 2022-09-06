@@ -1,5 +1,7 @@
 import traceback
+import time
 from datetime import datetime
+from threading import Thread
 
 from marshmallow import ValidationError
 from wazo_confd.helpers.resource import CRUDService
@@ -184,8 +186,8 @@ class CampaignService(CRUDService):
         call_args = {
             "autoanswer": True,
             "context": context,
-            "displayed_caller_id_name": "Milad Razban",
-            "displayed_caller_id_number": "161",
+            "displayed_caller_id_name": "",
+            "displayed_caller_id_number": "",
             "exten": campaign_contact_call.phone,
             "variables": {}
         }
@@ -193,6 +195,9 @@ class CampaignService(CRUDService):
             self.calld_client.applications.make_call(application_uuid, call_args)
         except:
             logging.error(traceback.format_exc())
+
+        thread = Thread(target=self.make_next_application_call_if_not_answered, args=(application_uuid, context))
+        thread.start()
 
     def hangup_application_call(self, application_uuid):
         calls = self.calld_client.applications.list_calls(application_uuid)
@@ -206,6 +211,15 @@ class CampaignService(CRUDService):
         }
         playback = self.calld_client.applications.send_playback(application_uuid, call_id, playback)
         return playback
+
+    def make_next_application_call_if_not_answered(self, application_uuid, context="internal"):
+        logger.warning("Waiting for answer...")
+        time.sleep(40)
+        campaign_contact_call = self.find_last_campaign_contact_call(application_uuid)
+        if campaign_contact_call \
+                and campaign_contact_call.make_call is not None \
+                and campaign_contact_call.call_answered is None:
+            self.make_next_application_call(application_uuid, context)
 
     def commit(self):
         try:

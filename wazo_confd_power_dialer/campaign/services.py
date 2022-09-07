@@ -72,11 +72,12 @@ class CampaignService(CRUDService):
 
     def resume(self, campaign_uuid):
         campaign = self.get_by(uuid=campaign_uuid)
-        if campaign.state != "resume":
+        if campaign.state != "pause":
             raise ValidationError("only campaigns with pause state can be resumed.")
         campaign.state = "resume"
         self.edit(campaign)
         self.commit()
+        self.make_next_application_call(campaign.application_uuid)
         return campaign
 
     def stop(self, campaign_uuid):
@@ -86,6 +87,15 @@ class CampaignService(CRUDService):
         self.commit()
         self.delete_empty_campaign_contact_call(campaign)
         return campaign
+
+    def finish(self, application_uuid):
+        campaign = self.get_by(application_uuid=application_uuid)
+        if campaign.state == "pause" or campaign.state == "stop":
+            return
+        campaign.state = "finish"
+        self.edit(campaign)
+        self.commit()
+        self.delete_application(application_uuid)
 
     def application_call_answered(self, event):
         if event["call"]["is_caller"]:
@@ -150,6 +160,9 @@ class CampaignService(CRUDService):
         self.confd_client.tenant_uuid = tenant_uuid
         return self.confd_client.applications.create(application_args)
 
+    def delete_application(self, application_uuid):
+        return self.confd_client.applications.delete(application_uuid)
+
     def create_empty_campaign_contact_call(self, campaign):
         for contact_list in campaign.contact_lists:
             contact_list_with_contacts = self.contact_list_service.get_by(uuid=contact_list.uuid)
@@ -177,6 +190,7 @@ class CampaignService(CRUDService):
     def make_next_application_call(self, application_uuid, context="internal"):
         campaign_contact_call = self.find_next_campaign_contact_call(application_uuid)
         if campaign_contact_call is None:
+            self.finish(application_uuid)
             return
 
         campaign_contact_call.make_call = datetime.now()
@@ -206,8 +220,12 @@ class CampaignService(CRUDService):
                 self.calld_client.applications.hangup_call(application_uuid, call["id"])
 
     def play_music(self, application_uuid, call_id):
+        campaign = self.get_by(application_uuid=application_uuid)
+        # playback = {
+        #     "uri": "sound:/var/lib/wazo/sounds/tenants/501ec54b-aa48-4492-bc5c-7af59c20705f/campaign/campagin_test"
+        # }
         playback = {
-            "uri": "sound:/var/lib/wazo/sounds/tenants/501ec54b-aa48-4492-bc5c-7af59c20705f/campaign/campagin_test"
+            "uri": "sound:" + campaign.playback_file
         }
         playback = self.calld_client.applications.send_playback(application_uuid, call_id, playback)
         return playback

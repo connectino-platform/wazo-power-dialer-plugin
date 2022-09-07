@@ -23,6 +23,8 @@ class CampaignBusEventHandler:
         bus_consumer.on_event('application_node_updated', self._application_node_updated)
         bus_consumer.on_event('application_user_outgoing_call_created', self._application_user_outgoing_call_created)
         bus_consumer.on_event('call_ended', self._call_ended)
+        bus_consumer.on_event('call_created', self._call_created)
+        bus_consumer.on_event('call_updated', self._call_updated)
 
     def _application_call_answered(self, event):
         logger.warning('========>application_call_answered<===========')
@@ -106,4 +108,12 @@ class CampaignBusEventHandler:
         # 'dialed_extension': '101', 'peer_caller_id_name': 'test2', 'peer_caller_id_number': '101',
         # 'caller_id_name': 'Milad Razban', 'reason_code': 16}
         logger.warning('========>call_ended<===========')
+        logger.warning(event)
+
+    def _call_created(self, event):
+        logger.warning('========>call_created<===========')
+        logger.warning(event)
+
+    def _call_updated(self, event):
+        logger.warning('========>call_updated<===========')
         logger.warning(event)

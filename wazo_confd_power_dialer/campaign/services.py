@@ -60,7 +60,7 @@ class CampaignService(CRUDService):
         self.commit()
         self.delete_empty_campaign_contact_call(campaign)
         self.create_empty_campaign_contact_call(campaign)
-        self.make_next_application_call(application["uuid"])
+        self.make_next_application_call(application["uuid"], campaign.context)
         return campaign
 
     def pause(self, campaign_uuid):
@@ -77,7 +77,7 @@ class CampaignService(CRUDService):
         campaign.state = "resume"
         self.edit(campaign)
         self.commit()
-        self.make_next_application_call(campaign.application_uuid)
+        self.make_next_application_call(campaign.application_uuid, campaign.context)
         return campaign
 
     def stop(self, campaign_uuid):
@@ -213,6 +213,16 @@ class CampaignService(CRUDService):
         thread = Thread(target=self.make_next_application_call_if_not_answered, args=(application_uuid, context))
         thread.start()
 
+    def make_next_application_call_if_not_answered(self, application_uuid, context="internal"):
+        logger.warning("Waiting for answer...")
+        campaign = self.get_by(application_uuid=application_uuid)
+        time.sleep(campaign.answer_wait_time)
+        campaign_contact_call = self.find_last_campaign_contact_call(application_uuid)
+        if campaign_contact_call \
+                and campaign_contact_call.make_call is not None \
+                and campaign_contact_call.call_answered is None:
+            self.make_next_application_call(application_uuid, context)
+
     def hangup_application_call(self, application_uuid):
         calls = self.calld_client.applications.list_calls(application_uuid)
         if calls.items:
@@ -229,15 +239,6 @@ class CampaignService(CRUDService):
         }
         playback = self.calld_client.applications.send_playback(application_uuid, call_id, playback)
         return playback
-
-    def make_next_application_call_if_not_answered(self, application_uuid, context="internal"):
-        logger.warning("Waiting for answer...")
-        time.sleep(40)
-        campaign_contact_call = self.find_last_campaign_contact_call(application_uuid)
-        if campaign_contact_call \
-                and campaign_contact_call.make_call is not None \
-                and campaign_contact_call.call_answered is None:
-            self.make_next_application_call(application_uuid, context)
 
     def commit(self):
         try:

@@ -45,3 +45,6 @@ drop table plugin_powerdialer_contact_list;
 drop table plugin_powerdialer_contact;
 drop table plugin_powerdialer_campaign;
 ```
+
+### Notice
+We should give `confd.#`,`calld.#` permission to `wazo-confd-internal`

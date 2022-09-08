@@ -27,8 +27,8 @@ class Plugin:
         logger.info('power_dialer plugin loading')
         api = dependencies['api']
         config = dependencies['config']
-        auth_client = AuthClient(host='127.0.0.1', username='root', password='12345', verify_certificate=False,
-                                 https=True)
+        # we should give `confd.#`,`calld.#` permission to `wazo-confd-internal`
+        auth_client = AuthClient(**config['auth'])
         calld_client = CalldClient(host='127.0.0.1', port=443, verify_certificate=False, https=True)
         confd_client = ConfdClient(host='127.0.0.1', port=443, verify_certificate=False, https=True)
         init_db('postgresql://asterisk:proformatique@localhost/asterisk?application_name=wazo-power_dialer-plugin')

@@ -1,10 +1,11 @@
+
 paths:
   /powerdialer/campaigns:
     get:
       summary: List campaign
       description: '**Required ACL:** `confd.powerdialer.campaigns.read`'
       tags:
-        - campaigns
+        - power dialer - campaigns
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/recurse'
@@ -22,7 +23,7 @@ paths:
       summary: Create campaign
       description: '**Required ACL:** `confd.powerdialer.campaigns.create`'
       tags:
-        - campaigns
+        - power dialer - campaigns
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - name: body
@@ -39,12 +40,12 @@ paths:
         '400':
           $ref: '#/responses/CreateError'
 
-  /campaigns/{campaign_uuid}:
+  /powerdialer/campaigns/{campaign_uuid}:
     get:
       summary: Get campaign
       description: '**Required ACL:** `confd.powerdialer.campaigns.{uuid}.read`'
       tags:
-        - campaigns
+        - power dialer - campaigns
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/campaignuuid'
@@ -59,7 +60,7 @@ paths:
       summary: Update campaign
       description: '**Required ACL:** `confd.powerdialer.campaigns.{uuid}.update`'
       tags:
-        - campaigns
+        - power dialer - campaigns
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/campaignuuid'
@@ -79,7 +80,7 @@ paths:
       summary: Delete campaign
       description: '**Required ACL:** `confd.powerdialer.campaigns.{uuid}.delete`'
       tags:
-        - campaigns
+        - power dialer - campaigns
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/campaignuuid'
@@ -92,13 +93,81 @@ paths:
           $ref: '#/responses/NotFoundError'
 
 
+  /powerdialer/campaigns/{campaign_uuid}/start:
+    put:
+      summary: Start campaign
+      description: '**Required ACL:** `confd.powerdialer.campaigns.{uuid}.start`'
+      tags:
+        - power dialer - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/campaignuuid'
+      responses:
+        '200':
+          description: Campaign
+          schema:
+            $ref: '#/definitions/Campaign'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+  /powerdialer/campaigns/{campaign_uuid}/pause:
+    put:
+      summary: Pause campaign
+      description: '**Required ACL:** `confd.powerdialer.campaigns.{uuid}.pause`'
+      tags:
+        - power dialer - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/campaignuuid'
+      responses:
+        '200':
+          description: Campaign
+          schema:
+            $ref: '#/definitions/Campaign'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+  /powerdialer/campaigns/{campaign_uuid}/resume:
+    put:
+      summary: Resume campaign
+      description: '**Required ACL:** `confd.powerdialer.campaigns.{uuid}.resume`'
+      tags:
+        - power dialer - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/campaignuuid'
+      responses:
+        '200':
+          description: Campaign
+          schema:
+            $ref: '#/definitions/Campaign'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+  /powerdialer/campaigns/{campaign_uuid}/stop:
+    put:
+      summary: Stop campaign
+      description: '**Required ACL:** `confd.powerdialer.campaigns.{uuid}.stop`'
+      tags:
+        - power dialer - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/campaignuuid'
+      responses:
+        '200':
+          description: Campaign
+          schema:
+            $ref: '#/definitions/Campaign'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
 
   /powerdialer/contacts:
     get:
       summary: List contact
       description: '**Required ACL:** `confd.powerdialer.contacts.read`'
       tags:
-        - contacts
+        - power dialer - contacts
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/recurse'
@@ -116,7 +185,7 @@ paths:
       summary: Create contact
       description: '**Required ACL:** `confd.powerdialer.contacts.create`'
       tags:
-        - contacts
+        - power dialer - contacts
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - name: body
@@ -133,12 +202,12 @@ paths:
         '400':
           $ref: '#/responses/CreateError'
 
-  /contacts/{contact_uuid}:
+  /powerdialer/contacts/{contact_uuid}:
     get:
       summary: Get contact
       description: '**Required ACL:** `confd.powerdialer.contacts.{uuid}.read`'
       tags:
-        - contacts
+        - power dialer - contacts
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/contactuuid'
@@ -153,7 +222,7 @@ paths:
       summary: Update contact
       description: '**Required ACL:** `confd.powerdialer.contacts.{uuid}.update`'
       tags:
-        - contacts
+        - power dialer - contacts
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/contactuuid'
@@ -173,7 +242,7 @@ paths:
       summary: Delete contact
       description: '**Required ACL:** `confd.powerdialer.contacts.{uuid}.delete`'
       tags:
-        - contacts
+        - power dialer - contacts
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/contactuuid'
@@ -184,6 +253,227 @@ paths:
           $ref: '#/responses/DeleteError'
         '404':
           $ref: '#/responses/NotFoundError'
+
+  /powerdialer/contacts/import/contact-lists/{contact_list_uuid}:
+    post:
+      summary: Import contact
+      description: '**Required ACL:** `confd.powerdialer.contacts.import`'
+      tags:
+        - power dialer - contacts
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/contactlistuuid'
+        - name: file_content
+          in: body
+          description: File content
+          schema:
+            type: string
+            format: binary
+          required: true
+      responses:
+        '201':
+          description: contacts list
+          schema:
+            $ref: '#/definitions/ContactItems'
+        '400':
+          $ref: '#/responses/CreateError'
+
+
+  /powerdialer/contact-lists:
+    get:
+      summary: List contact list
+      description: '**Required ACL:** `confd.powerdialer.contact-lists.read`'
+      tags:
+        - power dialer - contact lists
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: contact-lists list
+          schema:
+            $ref: '#/definitions/ContactListItems'
+    post:
+      summary: Create contact list
+      description: '**Required ACL:** `confd.powerdialer.contact-lists.create`'
+      tags:
+        - power dialer - contact lists
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          description: ContactList to create
+          required: true
+          schema:
+            $ref: '#/definitions/ContactList'
+      responses:
+        '201':
+          description: ContactList created
+          schema:
+            $ref: '#/definitions/ContactList'
+        '400':
+          $ref: '#/responses/CreateError'
+
+  /powerdialer/contact-lists/{contact_list_uuid}:
+    get:
+      summary: Get contact list
+      description: '**Required ACL:** `confd.powerdialer.contact-lists.{uuid}.read`'
+      tags:
+        - power dialer - contact lists
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/contactlistuuid'
+      responses:
+        '200':
+          description: ContactList
+          schema:
+            $ref: '#/definitions/ContactList'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      summary: Update contact list
+      description: '**Required ACL:** `confd.powerdialer.contact-lists.{uuid}.update`'
+      tags:
+        - power dialer - contact lists
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/contactlistuuid'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/ContactList'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      summary: Delete contact list
+      description: '**Required ACL:** `confd.powerdialer.contact-lists.{uuid}.delete`'
+      tags:
+        - power dialer - contact lists
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/contactlistuuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+  /powerdialer/contact-lists/{contact_list_uuid}/contact/{contact_uuid}:
+    post:
+      summary: Associate contact list with contact
+      description: '**Required ACL:** `confd.powerdialer.contact_contact_lists.create`'
+      tags:
+        - power dialer - contact lists
+        - power dialer - contacts
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/contactlistuuid'
+        - $ref: '#/parameters/contactuuid'
+      responses:
+        '201':
+          description: Created
+    delete:
+      summary: Dissociate contact list with contact
+      description: '**Required ACL:** `confd.powerdialer.contact_contact_lists.delete`'
+      tags:
+        - power dialer - contact lists
+        - power dialer - contacts
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/contactlistuuid'
+        - $ref: '#/parameters/contactuuid'
+      responses:
+        '204':
+          description: Deleted
+
+  /powerdialer/campaigns/{campaign_uuid}/contact-lists/{contact_list_uuid}:
+    post:
+      summary: Associate contact list with campaign
+      description: '**Required ACL:** `confd.powerdialer.campaign_contact_lists.create`'
+      tags:
+        - power dialer - contact lists
+        - power dialer - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/contactlistuuid'
+        - $ref: '#/parameters/campaignuuid'
+      responses:
+        '201':
+          description: Created
+    delete:
+      summary: Dissociate contact list with campaign
+      description: '**Required ACL:** `confd.powerdialer.campaign_contact_lists.delete`'
+      tags:
+        - power dialer - contact lists
+        - power dialer - campaigns
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/contactlistuuid'
+        - $ref: '#/parameters/campaignuuid'
+      responses:
+        '204':
+          description: Deleted
+
+  /powerdialer/campaign-contact-calls:
+    get:
+      summary: List campaign calls
+      description: '**Required ACL:** `confd.powerdialer.campaign_contact_calls.read`'
+      tags:
+        - power dialer - campaign contact call
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
+        - name: campaign_uuid
+          required: false
+          schema:
+            type: string
+          in: query
+          description: campaign uuid
+        - name: contact_list_uuid
+          required: false
+          schema:
+            type: string
+          in: query
+          description: contact list uuid
+        - name: contact_uuid
+          required: false
+          schema:
+            type: string
+          in: query
+          description: contact uuid
+        - name: phone
+          required: false
+          schema:
+            type: string
+          in: query
+          description: phone
+      responses:
+        '200':
+          description: campaign-contact-calls list
+          schema:
+            $ref: '#/definitions/CampaignContactCallItems'
+
+
+
+
 
 parameters:
   campaignuuid:
@@ -199,6 +489,13 @@ parameters:
     name: contact_uuid
     in: path
     description: Contact's UUID
+
+  contactlistuuid:
+    required: true
+    type: string
+    name: contact_list_uuid
+    in: path
+    description: Contact list's UUID
 
 definitions:
   Campaign:
@@ -232,6 +529,10 @@ definitions:
             type: integer
           attempts_interval:
             type: integer
+          context:
+            type: string
+          playback_file:
+            type: string
 
 
   CampaignItems:
@@ -284,4 +585,65 @@ definitions:
     required:
       - total
 
+  ContactList:
+    title: Contact List
+    allOf:
+      - properties:
+          uuid:
+            type: string
+            format: uuid
+            readOnly: true
+          name:
+            type: string
+          description:
+            type: string
 
+  ContactListItems:
+    title: ContactListItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/ContactList'
+      total:
+        type: integer
+    required:
+      - total
+
+  CampaignContactCall:
+    title: Campaign Contact Call
+    allOf:
+      - properties:
+          uuid:
+            type: string
+            format: uuid
+            readOnly: true
+          phone:
+            type: string
+          make_call:
+            format: date-time
+            type: string
+          call_answered:
+            format: date-time
+            type: string
+          playback_created:
+            format: date-time
+            type: string
+          playback_deleted:
+            format: date-time
+            type: string
+          call_deleted:
+            format: date-time
+            type: string
+
+  CampaignContactCallItems:
+    title: CampaignContactCallItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/CampaignContactCall'
+      total:
+        type: integer
+    required:
+      - total

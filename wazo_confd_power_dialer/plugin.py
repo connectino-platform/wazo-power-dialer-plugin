@@ -1,5 +1,4 @@
 import logging
-
 from wazo_calld_client import Client as CalldClient
 from wazo_auth_client import Client as AuthClient
 from wazo_confd_client import Client as ConfdClient
@@ -21,13 +20,11 @@ from .campaign_contact_call.services import build_campaign_contact_call_service
 
 logger = logging.getLogger(__name__)
 
-
 class Plugin:
     def load(self, dependencies):
         logger.info('power_dialer plugin loading')
         api = dependencies['api']
         config = dependencies['config']
-        # we should give `confd.#`,`calld.#` permission to `wazo-confd-internal`
         auth_client = AuthClient(**config['auth'])
         calld_client = CalldClient(host='127.0.0.1', port=443, verify_certificate=False, https=True)
         confd_client = ConfdClient(host='127.0.0.1', port=443, verify_certificate=False, https=True)
@@ -40,6 +37,8 @@ class Plugin:
         campaign_contact_call_service = build_campaign_contact_call_service()
         bus_consumer = dependencies['bus_consumer']
         bus_event_handler = CampaignBusEventHandler(campaign_service)
+
+        # Subscribe to bus events
         bus_event_handler.subscribe(bus_consumer)
 
         # Campaigns

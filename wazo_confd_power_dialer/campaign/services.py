@@ -100,22 +100,10 @@ class CampaignService(CRUDService):
     def application_call_answered(self, event):
         if event["call"]["is_caller"]:
             return
-        
-        # Fetch the campaign related to the application
-        campaign = self.get_by(application_uuid=event["application_uuid"])
-        
-        # Ensure the Stasis app is active before proceeding
-        if not self.is_stasis_app_active(event["application_uuid"]):
-            logging.error("Stasis app not active for application_uuid: %s", event["application_uuid"])
-            return
-        
-        # Update the call as answered
         campaign_contact_call = self.find_last_campaign_contact_call(event["application_uuid"])
         campaign_contact_call.call_answered = datetime.now()
         self.campaign_contact_call_service.edit(campaign_contact_call)
         self.commit()
-        
-        # Start playback
         self.play_music(event["application_uuid"], event["call"]["id"])
 
     def application_playback_created(self, event):
@@ -210,12 +198,9 @@ class CampaignService(CRUDService):
         self.campaign_contact_call_service.edit(campaign_contact_call)
         self.commit()
 
-        # Ensure the Stasis app is active before making the call
-        self.activate_stasis_app(application_uuid)
-
         call_args = {
             "autoanswer": True,
-            "context": campaign.context,
+            "context": campaign.context,  # Use campaign's context
             "displayed_caller_id_name": "",
             "displayed_caller_id_number": "",
             "exten": campaign_contact_call.phone,
@@ -228,10 +213,6 @@ class CampaignService(CRUDService):
 
         thread = Thread(target=self.make_next_application_call_if_not_answered, args=(application_uuid,))
         thread.start()
-
-    def activate_stasis_app(self, application_uuid):
-        # Implement the logic to activate the Stasis app
-        pass  # Placeholder
 
     def make_next_application_call_if_not_answered(self, application_uuid):
         logger.warning("Waiting for answer...")

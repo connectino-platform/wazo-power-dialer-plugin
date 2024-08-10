@@ -187,7 +187,8 @@ class CampaignService(CRUDService):
 
         Session.commit()
 
-    def make_next_application_call(self, application_uuid, context="internal"):
+    def make_next_application_call(self, application_uuid):
+        campaign = self.get_by(application_uuid=application_uuid)
         campaign_contact_call = self.find_next_campaign_contact_call(application_uuid)
         if campaign_contact_call is None:
             self.finish(application_uuid)
@@ -199,7 +200,7 @@ class CampaignService(CRUDService):
 
         call_args = {
             "autoanswer": True,
-            "context": context,
+            "context": campaign.context,  # Use campaign's context
             "displayed_caller_id_name": "",
             "displayed_caller_id_number": "",
             "exten": campaign_contact_call.phone,
@@ -210,10 +211,10 @@ class CampaignService(CRUDService):
         except:
             logging.error(traceback.format_exc())
 
-        thread = Thread(target=self.make_next_application_call_if_not_answered, args=(application_uuid, context))
+        thread = Thread(target=self.make_next_application_call_if_not_answered, args=(application_uuid,))
         thread.start()
 
-    def make_next_application_call_if_not_answered(self, application_uuid, context="internal"):
+    def make_next_application_call_if_not_answered(self, application_uuid):
         logger.warning("Waiting for answer...")
         campaign = self.get_by(application_uuid=application_uuid)
         time.sleep(campaign.answer_wait_time)
@@ -221,7 +222,8 @@ class CampaignService(CRUDService):
         if campaign_contact_call \
                 and campaign_contact_call.make_call is not None \
                 and campaign_contact_call.call_answered is None:
-            self.make_next_application_call(application_uuid, context)
+            self.make_next_application_call(application_uuid)
+
 
     def hangup_application_call(self, application_uuid):
         calls = self.calld_client.applications.list_calls(application_uuid)

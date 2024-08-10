@@ -60,7 +60,7 @@ class CampaignService(CRUDService):
         self.commit()
         self.delete_empty_campaign_contact_call(campaign)
         self.create_empty_campaign_contact_call(campaign)
-        self.make_next_application_call(application["uuid"], campaign.context)
+        self.make_next_application_call(application["uuid"])
         return campaign
 
     def pause(self, campaign_uuid):
@@ -77,7 +77,7 @@ class CampaignService(CRUDService):
         campaign.state = "resume"
         self.edit(campaign)
         self.commit()
-        self.make_next_application_call(campaign.application_uuid, campaign.context)
+        self.make_next_application_call(campaign.application_uuid)
         return campaign
 
     def stop(self, campaign_uuid):

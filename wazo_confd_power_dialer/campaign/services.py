@@ -53,14 +53,14 @@ class CampaignService(CRUDService):
 
     def start(self, campaign_uuid):
         campaign = self.get_by(uuid=campaign_uuid)
-        application = self.create_application(campaign.tenant_uuid)
-        campaign.application_uuid = application["uuid"]
+        # application = self.create_application(campaign.tenant_uuid)
+        campaign.application_uuid = "47545a6e-748f-4d99-b8e5-99632bd87546"
         campaign.state = "start"
         self.edit(campaign)
         self.commit()
         self.delete_empty_campaign_contact_call(campaign)
         self.create_empty_campaign_contact_call(campaign)
-        self.make_next_application_call(application["uuid"])
+        self.make_next_application_call("47545a6e-748f-4d99-b8e5-99632bd87546")
         return campaign
 
     def pause(self, campaign_uuid):

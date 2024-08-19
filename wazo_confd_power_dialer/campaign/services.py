@@ -46,7 +46,7 @@ class CampaignService(CRUDService):
         self.auth_client = auth_client
         self.calld_client = calld_client
         self.confd_client = confd_client
-        token = self.auth_client.token.new(expiration=365 * 24 * 60 * 60)['token']
+        token = "61668a13-c4b0-4c92-b022-1d052119f120"
         self.calld_client.set_token(token)
         self.confd_client.set_token(token)
         super().__init__(dao, validator, notifier, extra_parameters)

@@ -147,7 +147,10 @@ class CampaignService(CRUDService):
         return last_call
 
     def create_application(self, tenant_uuid):
+        # Define the application name
         application_name = f"{tenant_uuid}_campaign"
+        
+        # Define the application arguments
         application_args = {
             "name": application_name,
             "destination": "node",
@@ -156,10 +159,25 @@ class CampaignService(CRUDService):
                 "music_on_hold": "",
                 "type": "holding"
             },
-            "tenant_uuid" : tenant_uuid
         }
-        # self.confd_client.tenant_uuid = tenant_uuid
-        return self.confd_client.applications.create(application_args)
+        
+        # Set tenant_uuid in the confd_client if needed (this might be necessary if confd_client depends on it)
+        self.confd_client.tenant_uuid = tenant_uuid
+        
+        try:
+            # Attempt to create the application
+            response = self.confd_client.applications.create(application_args, tenant_uuid=tenant_uuid)
+            
+            # Log the successful response
+            logger.info(f"Application created successfully for tenant '{tenant_uuid}': {response}")
+            
+            return response
+        except Exception as e:
+            # Log the error with the exception details
+            logger.error(f"Failed to create application for tenant '{tenant_uuid}': {str(e)}")
+            
+            # Optionally, you could raise the exception again if you want the caller to handle it
+            raise
 
     def delete_application(self, application_uuid):
         return self.confd_client.applications.delete(application_uuid)

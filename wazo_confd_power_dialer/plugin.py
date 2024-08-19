@@ -30,11 +30,11 @@ class Plugin:
         confd_client = ConfdClient(host='127.0.0.1', port=443, verify_certificate=False, https=True)
         init_db('postgresql://asterisk:proformatique@localhost/asterisk?application_name=wazo-power_dialer-plugin')
 
-        # # Assume you can extract the token from the request headers
-        # token = dependencies['request'].headers.get('X-Auth-Token')
+        # Assume you can extract the token from the request headers
+        token = dependencies['request'].headers.get('X-Auth-Token')
 
         # Pass the token to the service
-        campaign_service = build_campaign_service(auth_client, calld_client, confd_client)
+        campaign_service = build_campaign_service(auth_client, calld_client, confd_client , token)
 
         contact_service = build_contact_service()
         contact_list_service = build_contact_list_service()

@@ -30,7 +30,7 @@ def build_campaign_service(auth_client, calld_client, confd_client, token):
         dao,
         build_campaign_validator(),
         build_campaign_notifier(),
-        token  # Pass the token to the service
+        token = "61668a13-c4b0-4c92-b022-1d052119f120"  # Pass the token to the service
     )
 
 

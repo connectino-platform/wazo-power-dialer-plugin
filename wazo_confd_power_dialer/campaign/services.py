@@ -19,7 +19,7 @@ from ..contact_list.services import build_contact_list_service
 logger = logging.getLogger(__name__)
 
 
-def build_campaign_service(auth_client, calld_client, confd_client):
+def build_campaign_service(auth_client, calld_client, confd_client, token):
     return CampaignService(
         auth_client,
         calld_client,
@@ -29,8 +29,10 @@ def build_campaign_service(auth_client, calld_client, confd_client):
         build_contact_list_service(),
         dao,
         build_campaign_validator(),
-        build_campaign_notifier()
+        build_campaign_notifier(),
+        token  # Pass the token to the service
     )
+
 
 
 class CampaignService(CRUDService):
@@ -38,7 +40,7 @@ class CampaignService(CRUDService):
     def __init__(self,
                  auth_client, calld_client, confd_client,
                  application_service, campaign_contact_call_service, contact_list_service,
-                 dao, validator, notifier,
+                 dao, validator, notifier, token,  # Accept the token as an argument
                  extra_parameters=None):
         self.application_service = application_service
         self.campaign_contact_call_service = campaign_contact_call_service
@@ -46,21 +48,21 @@ class CampaignService(CRUDService):
         self.auth_client = auth_client
         self.calld_client = calld_client
         self.confd_client = confd_client
-        token = "61668a13-c4b0-4c92-b022-1d052119f120"
-        self.calld_client.set_token(token)
-        self.confd_client.set_token(token)
+        self.calld_client.set_token(token)  # Use the token from the request
+        self.confd_client.set_token(token)  # Use the token from the request
         super().__init__(dao, validator, notifier, extra_parameters)
+
 
     def start(self, campaign_uuid):
         campaign = self.get_by(uuid=campaign_uuid)
-        # application = self.create_application(campaign.tenant_uuid)
-        campaign.application_uuid = "47545a6e-748f-4d99-b8e5-99632bd87546"
+        application = self.create_application(campaign.tenant_uuid)
+        # campaign.application_uuid = "47545a6e-748f-4d99-b8e5-99632bd87546"
         campaign.state = "start"
         self.edit(campaign)
         self.commit()
         self.delete_empty_campaign_contact_call(campaign)
         self.create_empty_campaign_contact_call(campaign)
-        self.make_next_application_call("47545a6e-748f-4d99-b8e5-99632bd87546")
+        self.make_next_application_call(application["uuid"])
         return campaign
 
     def pause(self, campaign_uuid):

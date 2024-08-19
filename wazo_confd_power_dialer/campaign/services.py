@@ -155,9 +155,10 @@ class CampaignService(CRUDService):
                 "answer": True,
                 "music_on_hold": "",
                 "type": "holding"
-            }
+            },
+            "tenant_uuid" : tenant_uuid
         }
-        self.confd_client.tenant_uuid = tenant_uuid
+        # self.confd_client.tenant_uuid = tenant_uuid
         return self.confd_client.applications.create(application_args)
 
     def delete_application(self, application_uuid):

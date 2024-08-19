@@ -46,21 +46,21 @@ class CampaignService(CRUDService):
         self.auth_client = auth_client
         self.calld_client = calld_client
         self.confd_client = confd_client
-        token = "61668a13-c4b0-4c92-b022-1d052119f120"
+        token = self.auth_client.token.new(expiration=365 * 24 * 60 * 60)['token']
         self.calld_client.set_token(token)
         self.confd_client.set_token(token)
         super().__init__(dao, validator, notifier, extra_parameters)
 
     def start(self, campaign_uuid):
         campaign = self.get_by(uuid=campaign_uuid)
-        # application = self.create_application(campaign.tenant_uuid)
-        campaign.application_uuid = "47545a6e-748f-4d99-b8e5-99632bd87546"
+        application = self.create_application(campaign.tenant_uuid)
+        campaign.application_uuid = application["uuid"]
         campaign.state = "start"
         self.edit(campaign)
         self.commit()
         self.delete_empty_campaign_contact_call(campaign)
         self.create_empty_campaign_contact_call(campaign)
-        self.make_next_application_call("47545a6e-748f-4d99-b8e5-99632bd87546")
+        self.make_next_application_call(application["uuid"])
         return campaign
 
     def pause(self, campaign_uuid):
@@ -147,10 +147,7 @@ class CampaignService(CRUDService):
         return last_call
 
     def create_application(self, tenant_uuid):
-        # Define the application name
         application_name = f"{tenant_uuid}_campaign"
-        
-        # Define the application arguments
         application_args = {
             "name": application_name,
             "destination": "node",
@@ -158,26 +155,10 @@ class CampaignService(CRUDService):
                 "answer": True,
                 "music_on_hold": "",
                 "type": "holding"
-            },
+            }
         }
-        
-        # Set tenant_uuid in the confd_client if needed (this might be necessary if confd_client depends on it)
         self.confd_client.tenant_uuid = tenant_uuid
-        
-        try:
-            # Attempt to create the application
-            response = self.confd_client.applications.create(application_args, tenant_uuid=tenant_uuid)
-            
-            # Log the successful response
-            logger.info(f"Application created successfully for tenant '{tenant_uuid}': {response}")
-            
-            return response
-        except Exception as e:
-            # Log the error with the exception details
-            logger.error(f"Failed to create application for tenant '{tenant_uuid}': {str(e)}")
-            
-            # Optionally, you could raise the exception again if you want the caller to handle it
-            raise
+        return self.confd_client.applications.create(application_args)
 
     def delete_application(self, application_uuid):
         return self.confd_client.applications.delete(application_uuid)
